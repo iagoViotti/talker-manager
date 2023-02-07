@@ -1,6 +1,8 @@
 const express = require('express');
 const fs = require('fs/promises');
 const path = require('path');
+const cryptoRandomString = require('../node_modules/crypto-random-string');
+const fieldValidation = require('./middlewares/fieldValidation');
 
 const app = express();
 app.use(express.json());
@@ -21,7 +23,6 @@ app.get('/talker', async (_req, res) => {
   const contentPath = path.resolve(__dirname, 'talker.json');
   const content = await fs.readFile(contentPath, 'utf-8');
   res.status(HTTP_OK_STATUS).json(JSON.parse(content));
-  console.log(typeof content);
 });
 
 /** req 2 */
@@ -38,3 +39,6 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 /** req 3 */
+app.post('/login', fieldValidation, async (req, res) => {
+  res.status(HTTP_OK_STATUS).json({ token: cryptoRandomString(16) });
+});
