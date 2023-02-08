@@ -1,8 +1,7 @@
 const express = require('express');
-const fs = require('fs/promises');
-const path = require('path');
 const cryptoRandomString = require('../node_modules/crypto-random-string');
 const fieldValidation = require('./middlewares/fieldValidation');
+const readDb = require('./utils/talkerManager');
 
 const app = express();
 app.use(express.json());
@@ -20,17 +19,14 @@ app.listen(PORT, () => {
 });
 /** req 1 */
 app.get('/talker', async (_req, res) => {
-  const contentPath = path.resolve(__dirname, 'talker.json');
-  const content = await fs.readFile(contentPath, 'utf-8');
-  res.status(HTTP_OK_STATUS).json(JSON.parse(content));
+  const content = await readDb();
+  res.status(HTTP_OK_STATUS).json(content);
 });
 
 /** req 2 */
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const contentPath = path.resolve(__dirname, 'talker.json');
-  const content = await fs.readFile(contentPath, 'utf-8');
-  const jsonContent = JSON.parse(content);
+  const jsonContent = await readDb();
   const response = jsonContent.find((talker) => talker.id === Number(id));
   if (!response) {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
@@ -38,7 +34,14 @@ app.get('/talker/:id', async (req, res) => {
   res.status(HTTP_OK_STATUS).json(response);
 });
 
-/** req 3 */
+/** req 3 & 4 */
 app.post('/login', fieldValidation, async (req, res) => {
   res.status(HTTP_OK_STATUS).json({ token: cryptoRandomString(16) });
 });
+
+/** req 5 */
+// app.post('/talker', async (req, res) => {
+//   const jsonContent = await readDb();
+  
+//   return res.status(HTTP_OK_STATUS).json({ message: 'talker posted' });
+// });
