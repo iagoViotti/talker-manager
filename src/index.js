@@ -1,6 +1,11 @@
 const express = require('express');
+const fs = require('fs/promises');
 const cryptoRandomString = require('../node_modules/crypto-random-string');
+const ageValidation = require('./middlewares/ageValidation');
+const authValidation = require('./middlewares/authValidation');
 const fieldValidation = require('./middlewares/fieldValidation');
+const nameValidation = require('./middlewares/nameValidation');
+const { talkValidation, rateValidation, rateEqualZero } = require('./middlewares/talkValidation');
 const readDb = require('./utils/talkerManager');
 
 const app = express();
@@ -40,8 +45,18 @@ app.post('/login', fieldValidation, async (req, res) => {
 });
 
 /** req 5 */
-// app.post('/talker', async (req, res) => {
-//   const jsonContent = await readDb();
+app.post(
+  '/talker',
+  authValidation,
+  nameValidation,
+  ageValidation,
+  talkValidation,
+  rateEqualZero,
+  rateValidation,
+  async (req, res) => {
+  const jsonContent = await readDb();
   
-//   return res.status(HTTP_OK_STATUS).json({ message: 'talker posted' });
-// });
+
+   res.status(201).json(req.body);
+},
+);
