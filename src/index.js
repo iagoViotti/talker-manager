@@ -45,8 +45,7 @@ app.post('/login', fieldValidation, async (req, res) => {
 });
 
 /** req 5 */
-app.post(
-  '/talker',
+app.post('/talker',
   authValidation,
   nameValidation,
   ageValidation,
@@ -54,9 +53,28 @@ app.post(
   rateEqualZero,
   rateValidation,
   async (req, res) => {
-  const jsonContent = await readDb();
-  
+    const jsonContent = await readDb();
+    req.body.id = jsonContent.length + 1;
+    jsonContent.push(req.body);
+    await fs.writeFile('src/talker.json', JSON.stringify(jsonContent));
+    res.status(201).json(req.body);
+});
 
-   res.status(201).json(req.body);
-},
-);
+/** req 6 */
+app.put('/talker/:id',
+authValidation,
+nameValidation,
+ageValidation,
+talkValidation,
+rateEqualZero,
+rateValidation,
+async (req, res) => {
+  const { id } = req.params;
+  const jsonContent = await readDb();
+  const newArray = jsonContent.filter((talker) => talker.id !== Number(id));
+  const newTalker = req.body;
+  newTalker.id = Number(id);
+  newArray.push(newTalker);
+  await fs.writeFile('src/talker.json', JSON.stringify(newArray));
+  res.status(200).json(req.body);
+});
