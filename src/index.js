@@ -78,3 +78,12 @@ async (req, res) => {
   await fs.writeFile('src/talker.json', JSON.stringify(newArray));
   res.status(200).json(req.body);
 });
+
+/** req 7 */
+app.delete('/talker/:id', authValidation, async (req, res) => {
+  const { id } = req.params;
+  const jsonContent = await readDb();
+  const result = jsonContent.filter((talker) => talker.id !== Number(id));
+  await fs.writeFile('src/talker.json', JSON.stringify(result));
+  return res.status(204).json();
+});
