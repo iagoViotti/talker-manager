@@ -87,3 +87,5 @@ app.delete('/talker/:id', authValidation, async (req, res) => {
   await fs.writeFile('src/talker.json', JSON.stringify(result));
   return res.status(204).json();
 });
+
+/** req 8 */
